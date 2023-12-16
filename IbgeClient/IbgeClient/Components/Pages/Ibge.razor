@@ -4,6 +4,13 @@
 
 <PageTitle>IBGE</PageTitle>
 
+<div class="container">
+    <form class="form-inline d-flex align-items-center">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" @bind="@cityName">
+        <button class="btn btn-outline-success" @onclick="() => GetByCityAsync(cityName)">Search</button>
+    </form>
+</div>
+
 @if (_listPlaces is null)
 {
     <p>
@@ -34,12 +41,22 @@ else
 }
 
 @code {
+    private string? cityName;
     private List<Place> _listPlaces = new List<Place>();
 
     protected override async Task OnInitializedAsync()
     {
         var client = new RestClient();
         var request = new RestRequest($"https://localhost:7122/v1/ibges/state?state=SP");
-        _listPlaces = await client.GetAsync<List<Place>?>(request);
+        _listPlaces = await client.GetAsync<List<Place>>(request);
+    }
+
+    public async Task GetByCityAsync(string cityName)
+    {
+        _listPlaces.Clear();
+
+        var client = new RestClient();
+        var request = new RestRequest($"https://localhost:7122/v1/ibges/city?city={cityName}");
+        _listPlaces = await client.GetAsync<List<Place>>(request);
     }
 }
