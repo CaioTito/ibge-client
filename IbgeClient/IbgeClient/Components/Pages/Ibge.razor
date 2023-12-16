@@ -1,11 +1,45 @@
 ﻿@page "/ibge"
+@using IbgeClient.Models
+@attribute [StreamRendering]
 
 <PageTitle>IBGE</PageTitle>
 
-<h1>IBGE</h1>
-
-<p>This IBGE demonstrates IBGE IBGE.</p>
+@if (_listPlaces is null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>City</th>
+                <th>State</th>
+                <th>CodeIbge</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in _listPlaces)
+            {
+                <tr>
+                    <td>@item.City</td>
+                    <td>@item.State</td>
+                    <td>@item.CodeIbge</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 @code {
-    
+    private List<Place> _listPlaces = new List<Place>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var client = new RestClient();
+        var request = new RestRequest($"https://localhost:7122/v1/ibges/state?state=SP");
+        _listPlaces = await client.GetAsync<List<Place>?>(request);
+    }
 }
