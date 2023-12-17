@@ -44,6 +44,7 @@ else
 @code {
     private string? data;
     private List<Place> _listPlaces = new List<Place>();
+    private Place _place = new Place();
 
     protected override async Task OnInitializedAsync()
     {
@@ -57,6 +58,12 @@ else
         if (data.Length == 2)
         {
             await GetByStateAsync(data);
+            return;
+        }
+
+        if (data.All(char.IsDigit))
+        {
+            await GetByCodeIbgeAsync(data);
             return;
         }
 
@@ -81,4 +88,14 @@ else
         _listPlaces = await client.GetAsync<List<Place>>(request);
     }
 
+    public async Task GetByCodeIbgeAsync(string codeIbge)
+    {
+        _listPlaces.Clear();
+
+        var client = new RestClient();
+        var request = new RestRequest($"https://localhost:7122/v1/ibges/codeIbge?codeIbge={codeIbge}");
+        _place = await client.GetAsync<Place>(request);
+
+        _listPlaces.Add(_place);
+    }
 }
