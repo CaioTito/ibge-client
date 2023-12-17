@@ -1,14 +1,15 @@
 ﻿@page "/ibge"
 @using IbgeClient.Models
-@attribute [StreamRendering]
+@using RestSharp
+@rendermode InteractiveAuto
 
 <PageTitle>IBGE</PageTitle>
 
 <div class="container">
-    <form class="form-inline d-flex align-items-center">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" @bind="@cityName">
-        <button class="btn btn-outline-success" @onclick="() => GetByCityAsync(cityName)">Search</button>
-    </form>
+    <div class="form-inline d-flex align-items-center">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" @bind="@data">
+        <button class="btn btn-outline-success" @onclick="() => Search(data)">Search</button>
+    </div>
 </div>
 
 @if (_listPlaces is null)
@@ -41,7 +42,7 @@ else
 }
 
 @code {
-    private string? cityName;
+    private string? data;
     private List<Place> _listPlaces = new List<Place>();
 
     protected override async Task OnInitializedAsync()
@@ -49,6 +50,17 @@ else
         var client = new RestClient();
         var request = new RestRequest($"https://localhost:7122/v1/ibges/state?state=SP");
         _listPlaces = await client.GetAsync<List<Place>>(request);
+    }
+
+    public async Task Search(string data)
+    {
+        if (data.Length == 2)
+        {
+            await GetByStateAsync(data);
+            return;
+        }
+
+        await GetByCityAsync(data);
     }
 
     public async Task GetByCityAsync(string cityName)
@@ -59,4 +71,14 @@ else
         var request = new RestRequest($"https://localhost:7122/v1/ibges/city?city={cityName}");
         _listPlaces = await client.GetAsync<List<Place>>(request);
     }
+
+    public async Task GetByStateAsync(string stateName)
+    {
+        _listPlaces.Clear();
+
+        var client = new RestClient();
+        var request = new RestRequest($"https://localhost:7122/v1/ibges/state?state={stateName}");
+        _listPlaces = await client.GetAsync<List<Place>>(request);
+    }
+
 }
