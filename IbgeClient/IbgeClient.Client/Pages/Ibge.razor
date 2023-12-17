@@ -5,21 +5,26 @@
 
 <PageTitle>IBGE</PageTitle>
 
-<div class="container">
-    <div class="form-inline d-flex align-items-center">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" @bind="@data">
-        <button class="btn btn-outline-success" @onclick="() => Search(data)">Search</button>
-    </div>
-</div>
+
 
 @if (_listPlaces is null)
 {
-    <p>
-        <em>Loading...</em>
-    </p>
+    <div class="container">
+        <div class="form-inline d-flex align-items-center">
+            <em>Não foi possivel carregar os dados...</em>
+            <button class="btn btn-outline-info m-2" @onclick="OnInitializedAsync">Refresh</button>
+        </div>
+    </div>
 }
 else
 {
+    <div class="container">
+        <div class="form-inline d-flex align-items-center">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" @bind="@data">
+            <button class="btn btn-outline-success" @onclick="() => Search(data)">Search</button>
+        </div>
+    </div>
+
     <table class="table">
         <thead>
             <tr>
@@ -48,20 +53,28 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        int skip = 0;
+        int take = 15;
+
         var client = new RestClient();
-        var request = new RestRequest($"https://localhost:7122/v1/ibges/state?state=SP");
+        var request = new RestRequest($"https://localhost:7122/v1/ibges?skip={skip}&take={take}");
         _listPlaces = await client.GetAsync<List<Place>>(request);
     }
 
     public async Task Search(string data)
     {
+        if (string.IsNullOrEmpty(data))
+        {
+            return;
+        }
+
         if (data.Length == 2)
         {
             await GetByStateAsync(data);
             return;
         }
 
-        if (data.All(char.IsDigit))
+        if (data.All(char.IsDigit) && data.Length == 7)
         {
             await GetByCodeIbgeAsync(data);
             return;
