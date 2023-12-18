@@ -1,4 +1,6 @@
 ﻿@page "/ibge"
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
 @rendermode InteractiveAuto
 
 <PageTitle>IBGE</PageTitle>
@@ -27,6 +29,7 @@ else
                 <th>City</th>
                 <th>State</th>
                 <th>CodeIbge</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -36,6 +39,11 @@ else
                     <td>@item.City</td>
                     <td>@item.State</td>
                     <td>@item.CodeIbge</td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="() => DeleteAsync(item.CodeIbge)">
+                            DELETE
+                        </button>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -50,11 +58,26 @@ else
     protected override async Task OnInitializedAsync()
     {
         int skip = 0;
-        int take = 15;
+        int take = 12;
 
         var client = new RestClient();
         var request = new RestRequest($"https://localhost:7122/v1/ibges?skip={skip}&take={take}");
         _listPlaces = await client.GetAsync<List<Place>>(request);
+    }
+
+    public async Task DeleteAsync(string codeIbge)
+    {
+        await GetByCodeIbgeAsync(codeIbge);
+
+        var token = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "token");
+
+        var client = new RestClient();
+        var request = new RestRequest($"https://localhost:7122/v1/ibges/id?id={_place.Id}");
+        request.AddHeader("Authorization", $"Bearer {token}");
+
+        var response = await client.DeleteAsync(request);
+
+        NavigationManager.NavigateTo("/ibge", true);
     }
 
     public async Task Search(string data)
