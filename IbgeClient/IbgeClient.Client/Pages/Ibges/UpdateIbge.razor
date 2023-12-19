@@ -1,0 +1,92 @@
+﻿@page "/update-ibge"
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@rendermode InteractiveAuto
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="text-center">
+            <h3>Update Place</h3>
+        </div>
+        <div class="col-md-4">
+            <form>
+                <div class="form-group">
+                    <label for="code">CodeIbge:</label>
+                    <input type="code" class="form-control" @bind="_codeIbge">
+                </div>
+                <div class="form-group">
+                    <label for="state">State:</label>
+                    <input type="state" class="form-control" @bind="_state">
+                </div>
+                <div class="form-group">
+                    <label for="city">City:</label>
+                    <input type="city" class="form-control" @bind="_city">
+                </div>
+                <div class="text-center">
+                    <button type="button" class="btn btn-primary mt-2" @onclick="Update">Enter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? _token;
+    private string? _codeIbge;
+    private string? _state;
+    private string? _city;
+    private Place _place = new Place();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _token = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "token");
+
+            if (string.IsNullOrEmpty(_token))
+                NavigationManager.NavigateTo("/auth");
+
+            var placeStorage = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "place");
+            _place = JsonSerializer.Deserialize<Place>(placeStorage);
+
+            _codeIbge = _place.CodeIbge;
+            _state = _place.State;
+            _city = _place.City;
+
+            StateHasChanged();
+        }
+    }
+
+    public async Task Update()
+    {
+        if (string.IsNullOrEmpty(_codeIbge) || string.IsNullOrEmpty(_state) || string.IsNullOrEmpty(_city))
+            return;
+
+        var jsonBody = new
+        {
+            codeIbge = _codeIbge,
+            state = _state,
+            city = _city
+        };
+
+        var options = new RestClientOptions("https://localhost:7122")
+        {
+            ThrowOnAnyError = false 
+        };
+        var client = new RestClient(options);
+        var request = new RestRequest($"https://localhost:7122/v1/ibges?codeIbge={_place.CodeIbge}").AddJsonBody(jsonBody);
+        request.AddHeader("Authorization", $"Bearer {_token}");
+
+        var response = await client.PutAsync(request);
+
+        if (response.IsSuccessful)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "User Atualizado com sucesso");
+            await JSRuntime.InvokeVoidAsync("sessionStorage.removeItem", "place");
+
+            NavigationManager.NavigateTo("/ibge");
+        }
+
+        await JSRuntime.InvokeVoidAsync("alert", "Erro ao atualizar o User");
+    }
+}

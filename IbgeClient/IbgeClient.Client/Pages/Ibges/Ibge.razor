@@ -30,7 +30,7 @@ else
                 <th>City</th>
                 <th>State</th>
                 <th>CodeIbge</th>
-                <th></th>
+                <th>Options</th>
             </tr>
         </thead>
         <tbody>
@@ -41,8 +41,11 @@ else
                     <td>@item.State</td>
                     <td>@item.CodeIbge</td>
                     <td>
-                        <button class="btn btn-danger" @onclick="() => DeleteAsync(item.CodeIbge)">
+                        <button class="btn btn-danger me-2" @onclick="() => DeleteAsync(item.CodeIbge)">
                             DELETE
+                        </button>                 
+                        <button class="btn btn-info" @onclick="() => UpdateAsync(item.CodeIbge)">
+                            UPDATE
                         </button>
                     </td>
                 </tr>
@@ -64,6 +67,17 @@ else
         var client = new RestClient();
         var request = new RestRequest($"https://localhost:7122/v1/ibges?skip={skip}&take={take}");
         _listPlaces = await client.GetAsync<List<Place>>(request);
+    }
+
+    public async Task UpdateAsync(string codeIbge)
+    {
+        await GetByCodeIbgeAsync(codeIbge);
+
+        var jsonBody = JsonSerializer.Serialize(_place);
+
+        await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "place", $"{jsonBody}");
+
+        NavigationManager.NavigateTo("/update-ibge", true);
     }
 
     public async Task DeleteAsync(string codeIbge)
