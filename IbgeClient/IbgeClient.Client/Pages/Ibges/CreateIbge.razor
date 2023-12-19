@@ -1,0 +1,77 @@
+﻿@page "/create-ibge"
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@rendermode InteractiveAuto
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="text-center">
+            <h3>Register New Place</h3>
+        </div>
+        <div class="col-md-4">
+            <form>
+                <div class="form-group">
+                    <label for="code">CodeIbge:</label>
+                    <input type="code" class="form-control" @bind="_codeIbge">
+                </div>
+                <div class="form-group">
+                    <label for="state">State:</label>
+                    <input type="state" class="form-control" @bind="_state">
+                </div>
+                <div class="form-group">
+                    <label for="city">City:</label>
+                    <input type="city" class="form-control" @bind="_city">
+                </div>
+                <div class="text-center">
+                    <button type="button" class="btn btn-primary mt-2" @onclick="Create">Enter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? _token;
+    private string? _codeIbge;
+    private string? _state;
+    private string? _city;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _token = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "token");
+
+            if (string.IsNullOrEmpty(_token))
+                NavigationManager.NavigateTo("/auth");
+
+            StateHasChanged();
+        }
+    }
+
+    public async Task Create()
+    {
+        if (string.IsNullOrEmpty(_codeIbge) || string.IsNullOrEmpty(_state) || string.IsNullOrEmpty(_city))
+            return;
+
+        var jsonBody = new
+        {
+            codeIbge = _codeIbge,
+            state = _state,
+            city = _city
+        };
+
+        var client = new RestClient();
+        var request = new RestRequest($"https://localhost:7122/v1/ibges").AddJsonBody(jsonBody);
+        request.AddHeader("Authorization", $"Bearer {_token}");
+
+        var response = await client.PostAsync(request);
+
+        if (response.IsSuccessful)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "User cadastrado com sucesso");
+        }
+
+        NavigationManager.NavigateTo("/ibge");
+    }
+}
