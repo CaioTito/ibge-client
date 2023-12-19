@@ -1,4 +1,4 @@
-using IbgeClient.Client.Pages;
+using IbgeClient.Client.Pages.Ibges;
 using IbgeClient.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +30,6 @@ app.UseAntiforgery();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(Counter).Assembly);
+    .AddAdditionalAssemblies(typeof(Ibge).Assembly);
 
 app.Run();
