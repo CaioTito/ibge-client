@@ -37,30 +37,40 @@
 
     public async Task CreateAsync()
     {
-        if (string.IsNullOrEmpty(_email) || string.IsNullOrEmpty(_password))
-            return;
-
-        var jsonBody = new
+        try
         {
-            email = new
+            if (string.IsNullOrEmpty(_email) || string.IsNullOrEmpty(_password))
+                return;
+
+            var jsonBody = new
             {
-                address = _email
-            },
-            password = _password
-        };
+                email = new
+                {
+                    address = _email
+                },
+                password = _password
+            };
 
-        var client = new RestClient();
-        var request = new RestRequest($"https://localhost:7122/v1/login").AddJsonBody(jsonBody);
-        var response = await client.PostAsync(request);
+            var client = new RestClient();
+            var request = new RestRequest($"https://localhost:7122/v1/login").AddJsonBody(jsonBody);
+            var response = await client.PostAsync(request);
 
-        if (response.IsSuccessful)
-        {
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var responseObject = JsonSerializer.Deserialize<AuthResponse>(response.Content, options);
+            if (response.IsSuccessful)
+            {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var responseObject = JsonSerializer.Deserialize<AuthResponse>(response.Content, options);
 
-            await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "token", responseObject.Token);
+                await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "token", responseObject.Token);
 
-            NavigationManager.NavigateTo("/ibge", true);
+                await JSRuntime.InvokeVoidAsync("alert", "Login realizado com sucesso");
+
+                NavigationManager.NavigateTo("/ibge", true);
+            }
         }
+        catch (Exception)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Falha ao realizar Login");
+        }
+        
     }
 }

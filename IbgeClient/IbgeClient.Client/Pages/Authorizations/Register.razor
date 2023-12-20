@@ -1,5 +1,6 @@
 ﻿@page "/register"
 @rendermode InteractiveAuto
+@inject IJSRuntime JSRuntime
 
 <div class="container mt-4">
     <div class="row justify-content-center">
@@ -39,26 +40,35 @@
 
     public async Task CreateAsync()
     {
-        if (string.IsNullOrEmpty(_email))
-            return;
-
-        var jsonBody = new
+        try
         {
-            email = new
+            if (string.IsNullOrEmpty(_email))
+                return;
+
+            var jsonBody = new
             {
-                address = _email
+                email = new
+                {
+                    address = _email
+                }
+            };
+
+            var client = new RestClient();
+            var request = new RestRequest($"https://localhost:7122/v1/accounts").AddJsonBody(jsonBody);
+            var response = await client.PostAsync(request);
+
+            if (response.IsSuccessful)
+            {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var responseObject = JsonSerializer.Deserialize<RegisterResponse>(response.Content, options);
+                _password = responseObject.Password;
+                await JSRuntime.InvokeVoidAsync("alert", "User criado com sucesso");
             }
-        };
-
-        var client = new RestClient();
-        var request = new RestRequest($"https://localhost:7122/v1/accounts").AddJsonBody(jsonBody);
-        var response = await client.PostAsync(request);
-
-        if (response.IsSuccessful)
-        {
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var responseObject = JsonSerializer.Deserialize<RegisterResponse>(response.Content, options);
-            _password = responseObject.Password;
         }
+        catch (Exception)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Falha ao criar User");
+        }
+        
     }
 }

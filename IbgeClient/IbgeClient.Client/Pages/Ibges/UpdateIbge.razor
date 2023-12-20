@@ -59,35 +59,36 @@
 
     public async Task Update()
     {
-        if (string.IsNullOrEmpty(_codeIbge) || string.IsNullOrEmpty(_state) || string.IsNullOrEmpty(_city))
-            return;
-
-        var jsonBody = new
+        try
         {
-            codeIbge = _codeIbge,
-            state = _state,
-            city = _city
-        };
+            if (string.IsNullOrEmpty(_codeIbge) || string.IsNullOrEmpty(_state) || string.IsNullOrEmpty(_city))
+                return;
 
-        var options = new RestClientOptions("https://localhost:7122")
-        {
-            ThrowOnAnyError = false 
-        };
-        var client = new RestClient(options);
-        var request = new RestRequest($"https://localhost:7122/v1/ibges?codeIbge={_place.CodeIbge}").AddJsonBody(jsonBody);
-        request.AddHeader("Authorization", $"Bearer {_token}");
+            var jsonBody = new
+            {
+                codeIbge = _codeIbge,
+                state = _state,
+                city = _city
+            };
 
-        var response = await client.PutAsync(request);
+            var client = new RestClient();
+            var request = new RestRequest($"https://localhost:7122/v1/ibges?codeIbge={_place.CodeIbge}").AddJsonBody(jsonBody);
+            request.AddHeader("Authorization", $"Bearer {_token}");
 
-        if (response.IsSuccessful)
-        {
-            await JSRuntime.InvokeVoidAsync("alert", "User Atualizado com sucesso");
-            await JSRuntime.InvokeVoidAsync("sessionStorage.removeItem", "place");
+            var response = await client.PutAsync(request);
 
-            NavigationManager.NavigateTo("/ibge");
-            return;
+            if (response.IsSuccessful)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Place Atualizado com sucesso");
+                await JSRuntime.InvokeVoidAsync("sessionStorage.removeItem", "place");
+
+                NavigationManager.NavigateTo("/ibge");
+                return;
+            }
         }
-
-        await JSRuntime.InvokeVoidAsync("alert", "Erro ao atualizar o User");
+        catch (Exception)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Erro ao atualizar o Place");
+        }
     }
 }

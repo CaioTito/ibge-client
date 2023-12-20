@@ -65,12 +65,19 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        int skip = 0;
-        int take = 12;
+        try
+        {
+            int skip = 0;
+            int take = 12;
 
-        var client = new RestClient();
-        var request = new RestRequest($"https://localhost:7122/v1/ibges?skip={skip}&take={take}");
-        _listPlaces = await client.GetAsync<List<Place>>(request);
+            var client = new RestClient();
+            var request = new RestRequest($"https://localhost:7122/v1/ibges?skip={skip}&take={take}");
+            _listPlaces = await client.GetAsync<List<Place>>(request);
+        }
+        catch (Exception)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Falha ao carregar Places");
+        }        
     }
 
     public async Task UpdateAsync(string codeIbge)
@@ -86,17 +93,25 @@ else
 
     public async Task DeleteAsync(string codeIbge)
     {
-        await GetByCodeIbgeAsync(codeIbge);
+        try
+        {
+            await GetByCodeIbgeAsync(codeIbge);
 
-        var token = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "token");
+            var token = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "token");
 
-        var client = new RestClient();
-        var request = new RestRequest($"https://localhost:7122/v1/ibges/id?id={_place.Id}");
-        request.AddHeader("Authorization", $"Bearer {token}");
+            var client = new RestClient();
+            var request = new RestRequest($"https://localhost:7122/v1/ibges/id?id={_place.Id}");
+            request.AddHeader("Authorization", $"Bearer {token}");
 
-        var response = await client.DeleteAsync(request);
+            var response = await client.DeleteAsync(request);
 
-        NavigationManager.NavigateTo("/ibge", true);
+            NavigationManager.NavigateTo("/ibge", true);
+        }
+        catch (Exception)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Falha ao deletar Place");
+        }
+        
     }
 
     public async Task Search(string data)

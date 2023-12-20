@@ -51,27 +51,35 @@
 
     public async Task Create()
     {
-        if (string.IsNullOrEmpty(_codeIbge) || string.IsNullOrEmpty(_state) || string.IsNullOrEmpty(_city))
-            return;
-
-        var jsonBody = new
+        try
         {
-            codeIbge = _codeIbge,
-            state = _state,
-            city = _city
-        };
+            if (string.IsNullOrEmpty(_codeIbge) || string.IsNullOrEmpty(_state) || string.IsNullOrEmpty(_city))
+                return;
 
-        var client = new RestClient();
-        var request = new RestRequest($"https://localhost:7122/v1/ibges").AddJsonBody(jsonBody);
-        request.AddHeader("Authorization", $"Bearer {_token}");
+            var jsonBody = new
+            {
+                codeIbge = _codeIbge,
+                state = _state,
+                city = _city
+            };
 
-        var response = await client.PostAsync(request);
+            var client = new RestClient();
+            var request = new RestRequest($"https://localhost:7122/v1/ibges").AddJsonBody(jsonBody);
+            request.AddHeader("Authorization", $"Bearer {_token}");
 
-        if (response.IsSuccessful)
-        {
-            await JSRuntime.InvokeVoidAsync("alert", "User cadastrado com sucesso");
+            var response = await client.PostAsync(request);
+
+            if (response.IsSuccessful)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Place cadastrado com sucesso");
+                NavigationManager.NavigateTo("/ibge");
+            }
+
         }
-
-        NavigationManager.NavigateTo("/ibge");
+        catch (Exception)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Falha ao cadastrar Place");
+        }
+        
     }
 }
