@@ -85,6 +85,7 @@
             await JSRuntime.InvokeVoidAsync("sessionStorage.removeItem", "place");
 
             NavigationManager.NavigateTo("/ibge");
+            return;
         }
 
         await JSRuntime.InvokeVoidAsync("alert", "Erro ao atualizar o User");
