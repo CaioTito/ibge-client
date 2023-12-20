@@ -1,4 +1,6 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Blazorise
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">IbgeClient</a>
     </div>
@@ -10,19 +12,19 @@
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="auth" Match="NavLinkMatch.All">
-                <span class="" aria-hidden="true"></span> Login
+                <span class="" aria-hidden="true"></span><Icon Name="IconName.User" class="me-2"/> Login
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="register">
-                <span class="" aria-hidden="true"></span> Register
+                <span class="" aria-hidden="true"></span><Icon Name="IconName.UserPlus" class="me-1"/> Register
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="ibge">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Ibge
+                <span class="" aria-hidden="true"></span><Icon Name="IconName.Map" class="me-2"/> Ibge
             </NavLink>
         </div>
     </nav>

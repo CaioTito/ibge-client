@@ -6,23 +6,27 @@
 
 <div class="container mt-4">
     <div class="row justify-content-center">
-        <div class="text-center">
-            <h3>Login</h3>
-        </div>
-        <div class="col-md-4">
-            <form>
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" class="form-control" @bind="_email">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Login</h3>
+                    <form>
+                        <div class="mb-2">
+                            <label for="email"><strong>Email</strong></label>
+                            <input type="email" class="form-control" placeholder="Enter your email address" @bind="_email">
+                        </div>
+                        <div class="mb-2">
+                            <label for="password"><strong>Password</strong></label>
+                            <input type="password" class="form-control" placeholder="Enter your password" @bind="_password">
+                        </div>
+                        <div class="text-center">
+                            <button type="button" class="btn btn-success mt-2" @onclick="CreateAsync">
+                                <Icon Name="IconName.ArrowRight" class="me-1" /> Sign In
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <div class="form-group">
-                    <label for="password">Password:</label>
-                    <input type="password" class="form-control" @bind="_password">
-                </div>
-                <div class="text-center">
-                    <button type="button" class="btn btn-primary mt-2" @onclick="CreateAsync">Enter</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
