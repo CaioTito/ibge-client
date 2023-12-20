@@ -1,5 +1,7 @@
 ﻿@page "/auth"
 @page "/"
+@using System.Net
+@using IbgeClient.Client.Enums
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @rendermode InteractiveAuto
@@ -52,7 +54,7 @@
             };
 
             var client = new RestClient();
-            var request = new RestRequest($"https://localhost:7122/v1/login").AddJsonBody(jsonBody);
+            var request = new RestRequest(Endpoint.Login.GetEnumDescription()).AddJsonBody(jsonBody);
             var response = await client.PostAsync(request);
 
             if (response.IsSuccessful)

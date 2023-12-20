@@ -1,4 +1,5 @@
 ﻿@page "/ibge"
+@using IbgeClient.Client.Enums
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @rendermode InteractiveAuto
@@ -71,7 +72,7 @@ else
             int take = 12;
 
             var client = new RestClient();
-            var request = new RestRequest($"https://localhost:7122/v1/ibges?skip={skip}&take={take}");
+            var request = new RestRequest($"{Endpoint.GetIbges.GetEnumDescription()}?skip={skip}&take={take}");
             _listPlaces = await client.GetAsync<List<Place>>(request);
         }
         catch (Exception)
@@ -100,7 +101,7 @@ else
             var token = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "token");
 
             var client = new RestClient();
-            var request = new RestRequest($"https://localhost:7122/v1/ibges/id?id={_place.Id}");
+            var request = new RestRequest($"{Endpoint.DeleteIbges.GetEnumDescription()}?id={_place.Id}");
             request.AddHeader("Authorization", $"Bearer {token}");
 
             var response = await client.DeleteAsync(request);
@@ -141,7 +142,7 @@ else
         _listPlaces.Clear();
 
         var client = new RestClient();
-        var request = new RestRequest($"https://localhost:7122/v1/ibges/city?city={cityName}");
+        var request = new RestRequest($"{Endpoint.GetIbgesCity.GetEnumDescription()}?city={cityName}");
         _listPlaces = await client.GetAsync<List<Place>>(request);
     }
 
@@ -150,7 +151,7 @@ else
         _listPlaces.Clear();
 
         var client = new RestClient();
-        var request = new RestRequest($"https://localhost:7122/v1/ibges/state?state={stateName}");
+        var request = new RestRequest($"{Endpoint.GetIbgesState.GetEnumDescription()}?state={stateName}");
         _listPlaces = await client.GetAsync<List<Place>>(request);
     }
 
@@ -159,7 +160,7 @@ else
         _listPlaces.Clear();
 
         var client = new RestClient();
-        var request = new RestRequest($"https://localhost:7122/v1/ibges/codeIbge?codeIbge={codeIbge}");
+        var request = new RestRequest($"{Endpoint.GetCodeIbges.GetEnumDescription()}?codeIbge={codeIbge}");
         _place = await client.GetAsync<Place>(request);
 
         _listPlaces.Add(_place);
