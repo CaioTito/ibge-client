@@ -59,10 +59,15 @@ else
     </table>
 }
 
+<SnackbarStack @ref="snackbarStack" Location="SnackbarStackLocation.BottomEnd" />
+
 @code {
     private string? data;
     private List<Place> _listPlaces = new List<Place>();
     private Place _place = new Place();
+
+    private string? _message;
+    SnackbarStack snackbarStack = new SnackbarStack();
 
     protected override async Task OnInitializedAsync()
     {
@@ -77,7 +82,8 @@ else
         }
         catch (Exception)
         {
-            await JSRuntime.InvokeVoidAsync("alert", "Falha ao carregar Places");
+            _message = "Error loading locations ";
+            await snackbarStack.PushAsync(_message, SnackbarColor.Danger);
         }        
     }
 
@@ -110,7 +116,8 @@ else
         }
         catch (Exception)
         {
-            await JSRuntime.InvokeVoidAsync("alert", "Falha ao deletar Place");
+            _message = "Error when deleting locations ";
+            await snackbarStack.PushAsync(_message, SnackbarColor.Danger);
         }
         
     }

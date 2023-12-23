@@ -27,7 +27,11 @@
                             <button type="button" class="btn btn-success mt-2" @onclick="Update">
                                 <Icon Name="IconName.Save" class="me-1" /> Update
                             </button>
+                            <button type="button" class="btn btn-danger mt-2 me-2" @onclick="Cancel">
+                                <Icon Name="IconName.ArrowLeft" class="me-1" /> Cancel
+                            </button>
                         </div>
+                        <SnackbarStack @ref="snackbarStack" Location="SnackbarStackLocation.BottomEnd" />
                     </form>
                 </div>
             </div>
@@ -41,6 +45,9 @@
     private string? _state;
     private string? _city;
     private Place _place = new Place();
+
+    private string? _message;
+    SnackbarStack snackbarStack = new SnackbarStack();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -84,7 +91,9 @@
 
             if (response.IsSuccessful)
             {
-                await JSRuntime.InvokeVoidAsync("alert", "Place Atualizado com sucesso");
+                _message = "Place updated successfully ";
+                await snackbarStack.PushAsync(_message, SnackbarColor.Success);
+
                 await JSRuntime.InvokeVoidAsync("sessionStorage.removeItem", "place");
 
                 NavigationManager.NavigateTo("/ibge");
@@ -93,7 +102,13 @@
         }
         catch (Exception)
         {
-            await JSRuntime.InvokeVoidAsync("alert", "Erro ao atualizar o Place");
+            _message = "Error when updating place ";
+            await snackbarStack.PushAsync(_message, SnackbarColor.Danger);
         }
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/ibge");
     }
 }

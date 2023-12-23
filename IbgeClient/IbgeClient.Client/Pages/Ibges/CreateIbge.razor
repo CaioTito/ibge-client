@@ -27,7 +27,11 @@
                             <button type="button" class="btn btn-success mt-2" @onclick="Create">
                                 <Icon Name="IconName.Save" class="me-1" /> Register
                             </button>
+                            <button type="button" class="btn btn-danger mt-2 me-2" @onclick="Cancel">
+                                <Icon Name="IconName.ArrowLeft" class="me-1" /> Cancel
+                            </button>                   
                         </div>
+                        <SnackbarStack @ref="snackbarStack" Location="SnackbarStackLocation.BottomEnd" />
                     </form>
                 </div>
             </div>
@@ -40,6 +44,9 @@
     private string? _codeIbge;
     private string? _state;
     private string? _city;
+
+    private string? _message;
+    SnackbarStack snackbarStack = new SnackbarStack();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -76,15 +83,22 @@
 
             if (response.IsSuccessful)
             {
-                await JSRuntime.InvokeVoidAsync("alert", "Place cadastrado com sucesso");
+                _message = "Place created successfully ";
+                await snackbarStack.PushAsync(_message, SnackbarColor.Success);
+
                 NavigationManager.NavigateTo("/ibge");
             }
 
         }
         catch (Exception)
         {
-            await JSRuntime.InvokeVoidAsync("alert", "Falha ao cadastrar Place");
-        }
-        
+            _message = "Error when creating place ";
+            await snackbarStack.PushAsync(_message, SnackbarColor.Danger);
+        }     
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/ibge");
     }
 }
