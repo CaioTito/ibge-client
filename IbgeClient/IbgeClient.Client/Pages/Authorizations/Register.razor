@@ -30,6 +30,7 @@
                         </div>
                     </div>
                 }
+                <SnackbarStack @ref="snackbarStack" Location="SnackbarStackLocation.BottomEnd" />
             </div>
         </div>
     </div>
@@ -38,6 +39,9 @@
 @code {
     private string? _email;
     private string? _password;
+
+    private string? _message;
+    SnackbarStack snackbarStack = new SnackbarStack();
 
     public async Task CreateAsync()
     {
@@ -63,13 +67,15 @@
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 var responseObject = JsonSerializer.Deserialize<RegisterResponse>(response.Content, options);
                 _password = responseObject.Password;
-                await JSRuntime.InvokeVoidAsync("alert", "User criado com sucesso");
+
+                _message = "User created successfully ";
+                await snackbarStack.PushAsync(_message, SnackbarColor.Success);
             }
         }
         catch (Exception)
         {
-            await JSRuntime.InvokeVoidAsync("alert", "Falha ao criar User");
-        }
-        
+            _message = "Error creating user ";
+            await snackbarStack.PushAsync(_message, SnackbarColor.Danger);
+        }      
     }
 }

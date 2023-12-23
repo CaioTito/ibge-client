@@ -28,14 +28,20 @@
                         </div>
                     </form>
                 </div>
+                <SnackbarStack @ref="snackbarStack" Location="SnackbarStackLocation.BottomEnd" />
             </div>
         </div>
     </div>
 </div>
 
+
+
 @code {
     private string? _email;
     private string? _password;
+
+    private string? _message;
+    SnackbarStack snackbarStack = new SnackbarStack();
 
     public async Task CreateAsync()
     {
@@ -64,14 +70,16 @@
 
                 await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "token", responseObject.Token);
 
-                await JSRuntime.InvokeVoidAsync("alert", "Login realizado com sucesso");
+                _message = "Login successfully ";
+                await snackbarStack.PushAsync(_message, SnackbarColor.Success);
 
                 NavigationManager.NavigateTo("/ibge", true);
             }
         }
         catch (Exception)
         {
-            await JSRuntime.InvokeVoidAsync("alert", "Falha ao realizar Login");
+            _message = "Unable to login ";
+            await snackbarStack.PushAsync(_message, SnackbarColor.Danger);
         }
         
     }
