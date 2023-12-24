@@ -19,9 +19,9 @@ else
 {
     <div class="container">
         <div class="form-inline d-flex align-items-center">
-            <a class="btn btn-success me-2" href="create-ibge" style="width: 200px"><Icon Name="IconName.PlusSquare" class="me-1" />Create Place</a>
+            <a class="btn btn-success me-2" href="create-ibge" style="width: 200px; height: 37px;"><Icon Name="IconName.PlusSquare" class="me-1" />Create Place</a>
             <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" @bind="@data">
-            <button class="btn btn-outline-info" style="width: 200px" @onclick="() => Search(data)"><Icon Name="IconName.Search" class="me-1" />Search</button>
+            <button class="btn btn-outline-info" style="width: 200px; height: 37px;" @onclick="() => Search(data)"><Icon Name="IconName.Search" class="me-1" />Search</button>
         </div>
     </div>
 
@@ -43,11 +43,11 @@ else
                     <td>@item.CodeIbge</td>
                     <td>
                         <div class="d-flex flex-column flex-sm-row align-items-sm-center">
-                            <button class="btn btn-outline-danger me-2 mb-2 mb-sm-0" @onclick="() => DeleteAsync(item.CodeIbge)">
+                            <button class="btn btn-outline-danger me-2 mb-2 mb-sm-0" style="height: inherit;" @onclick="() => DeleteAsync(item.CodeIbge)">
                                 <Icon Name="IconName.Delete" class="me-1" />
                                 Delete
                             </button>
-                            <button class="btn btn-outline-info" @onclick="() => UpdateAsync(item.CodeIbge)">
+                            <button class="btn btn-outline-info" style="height: inherit;" @onclick="() => UpdateAsync(item.CodeIbge)">
                                 <Icon Name="IconName.Edit" class="me-1" />
                                 Update
                             </button>
