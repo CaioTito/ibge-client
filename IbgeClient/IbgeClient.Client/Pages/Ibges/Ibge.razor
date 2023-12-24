@@ -1,5 +1,4 @@
 ﻿@page "/ibge"
-@using IbgeClient.Client.Enums
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @rendermode InteractiveAuto
@@ -43,7 +42,7 @@ else
                     <td>@item.CodeIbge</td>
                     <td>
                         <div class="d-flex flex-column flex-sm-row align-items-sm-center">
-                            <button class="btn btn-outline-danger me-2 mb-2 mb-sm-0" style="height: inherit;" @onclick="() => ShowModal()">
+                            <button class="btn btn-outline-danger me-2 mb-2 mb-sm-0" style="height: inherit;" @onclick="() => ShowModal(item)">
                                 <Icon Name="IconName.Delete" class="me-1" />
                                 Delete
                             </button>
@@ -54,29 +53,29 @@ else
                         </div>
                     </td>
                 </tr>
-                <Modal @ref="modalRef">
-                    <ModalContent Centered>
-                         <ModalHeader>
-                             <ModalTitle>Location Exclusion</ModalTitle>
-                             <button class="btn btn-outline-secondary" @onclick="HideModal"> X </button>
-                         </ModalHeader>
-                         <ModalBody>
-                             <Field>
-                                 <FieldLabel>Do you want to delete this location?</FieldLabel>
-                             </Field>
-                         </ModalBody>
-                         <ModalFooter>
-                             <button class="btn btn-outline-danger me-2 mb-2 mb-sm-0" style="height: inherit;" @onclick="() => DeleteAsync(item.CodeIbge)">
-                                 <Icon Name="IconName.CheckCircle" class="me-1" />
-                                 Confirm
-                             </button>
-                         </ModalFooter>
-                    </ModalContent>
-                </Modal>
             }
         </tbody>
     </table>
 }
+
+<Modal @ref="modalRef">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Delete @_place.City</ModalTitle>
+                <button class="btn btn-outline-secondary" @onclick="HideModal"> X </button>
+        </ModalHeader>
+        <ModalBody>
+            <Field>
+                <FieldLabel>Do you want to delete this location?</FieldLabel>
+            </Field>
+        </ModalBody>
+        <ModalFooter>
+            <button class="btn btn-outline-danger me-2 mb-2 mb-sm-0" style="height: inherit;" @onclick="() => DeleteAsync(_place.CodeIbge)">
+                <Icon Name="IconName.CheckCircle" class="me-1" /> Confirm
+            </button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
 
 <SnackbarStack @ref="snackbarStack" Location="SnackbarStackLocation.BottomEnd" />
 
@@ -197,8 +196,9 @@ else
         _listPlaces.Add(_place);
     }
 
-    private Task ShowModal()
+    private Task ShowModal(Place item)
     {
+        _place = item;
         return modalRef.Show();
     }
 
