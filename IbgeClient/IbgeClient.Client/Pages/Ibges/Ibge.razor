@@ -43,7 +43,7 @@ else
                     <td>@item.CodeIbge</td>
                     <td>
                         <div class="d-flex flex-column flex-sm-row align-items-sm-center">
-                            <button class="btn btn-outline-danger me-2 mb-2 mb-sm-0" style="height: inherit;" @onclick="() => DeleteAsync(item.CodeIbge)">
+                            <button class="btn btn-outline-danger me-2 mb-2 mb-sm-0" style="height: inherit;" @onclick="() => ShowModal()">
                                 <Icon Name="IconName.Delete" class="me-1" />
                                 Delete
                             </button>
@@ -54,6 +54,25 @@ else
                         </div>
                     </td>
                 </tr>
+                <Modal @ref="modalRef">
+                    <ModalContent Centered>
+                         <ModalHeader>
+                             <ModalTitle>Location Exclusion</ModalTitle>
+                             <button class="btn btn-outline-secondary" @onclick="HideModal"> X </button>
+                         </ModalHeader>
+                         <ModalBody>
+                             <Field>
+                                 <FieldLabel>Do you want to delete this location?</FieldLabel>
+                             </Field>
+                         </ModalBody>
+                         <ModalFooter>
+                             <button class="btn btn-outline-danger me-2 mb-2 mb-sm-0" style="height: inherit;" @onclick="() => DeleteAsync(item.CodeIbge)">
+                                 <Icon Name="IconName.CheckCircle" class="me-1" />
+                                 Confirm
+                             </button>
+                         </ModalFooter>
+                    </ModalContent>
+                </Modal>
             }
         </tbody>
     </table>
@@ -68,6 +87,8 @@ else
 
     private string? _message;
     SnackbarStack snackbarStack = new SnackbarStack();
+
+    private Modal modalRef = new Modal();
 
     protected override async Task OnInitializedAsync()
     {
@@ -84,7 +105,7 @@ else
         {
             _message = "Error loading locations ";
             await snackbarStack.PushAsync(_message, SnackbarColor.Danger);
-        }        
+        }
     }
 
     public async Task UpdateAsync(string codeIbge)
@@ -112,6 +133,9 @@ else
 
             var response = await client.DeleteAsync(request);
 
+            _message = "Location deleted successfully ";
+            await snackbarStack.PushAsync(_message, SnackbarColor.Success);
+
             NavigationManager.NavigateTo("/ibge", true);
         }
         catch (Exception)
@@ -119,7 +143,7 @@ else
             _message = "Error when deleting locations ";
             await snackbarStack.PushAsync(_message, SnackbarColor.Danger);
         }
-        
+
     }
 
     public async Task Search(string data)
@@ -171,5 +195,15 @@ else
         _place = await client.GetAsync<Place>(request);
 
         _listPlaces.Add(_place);
+    }
+
+    private Task ShowModal()
+    {
+        return modalRef.Show();
+    }
+
+    private Task HideModal()
+    {
+        return modalRef.Hide();
     }
 }
